@@ -1,0 +1,40 @@
+{
+	ignore_grep_leaks
+	Memcheck:Leak
+	...
+	obj:/usr/bin/grep
+	fun:(below main)
+}
+{
+	ignore_sort_leaks
+	Memcheck:Leak
+	...
+	obj:/usr/bin/sort
+	fun:(below main)
+}
+{
+	ignore_ls_leaks
+	Memcheck:Leak
+	...
+	obj:/usr/bin/ls
+	fun:(below main)
+}
+{
+	ignore_chmod_leaks
+	Memcheck:Leak
+	...
+	obj:/usr/bin/chmod
+	fun:(below main)
+}
+{
+	ignore_readline_leaks
+	Memcheck:Leak
+	...
+	fun:readline
+}
+{
+	ignore_rl_history_leaks
+	Memcheck:Leak
+	...
+	fun:add_history
+}

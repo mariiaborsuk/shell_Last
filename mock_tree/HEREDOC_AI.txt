@@ -1,0 +1,178 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+// Structure to hold heredoc content
+typedef struct s_heredoc {
+    char *content;
+    size_t size;
+    size_t capacity;
+} t_heredoc;
+
+// Initialize heredoc structure
+static t_heredoc *init_heredoc(void)
+{
+    t_heredoc *heredoc = malloc(sizeof(t_heredoc));
+    if (!heredoc)
+        return (NULL);
+
+    heredoc->capacity = 1024;  // Initial capacity
+    heredoc->content = malloc(heredoc->capacity);
+    if (!heredoc->content) {
+        free(heredoc);
+        return (NULL);
+    }
+
+    heredoc->content[0] = '\0';
+    heredoc->size = 0;
+    return (heredoc);
+}
+
+// Resize heredoc buffer if needed
+static int resize_heredoc(t_heredoc *heredoc, size_t needed_size)
+{
+    char *new_content;
+    size_t new_capacity;
+
+    if (needed_size <= heredoc->capacity)
+        return (1);
+
+    new_capacity = heredoc->capacity;
+    while (new_capacity < needed_size)
+        new_capacity *= 2;
+
+    new_content = realloc(heredoc->content, new_capacity);
+    if (!new_content)
+        return (0);
+
+    heredoc->content = new_content;
+    heredoc->capacity = new_capacity;
+    return (1);
+}
+
+// Append line to heredoc content
+static int append_line(t_heredoc *heredoc, const char *line)
+{
+    size_t line_len = strlen(line);
+    size_t needed_size = heredoc->size + line_len + 2; // +1 for \n, +1 for \0
+
+    if (!resize_heredoc(heredoc, needed_size))
+        return (0);
+
+    strcat(heredoc->content + heredoc->size, line);
+    heredoc->size += line_len;
+
+    // Add newline (heredoc preserves newlines)
+    heredoc->content[heredoc->size] = '\n';
+    heredoc->size++;
+    heredoc->content[heredoc->size] = '\0';
+
+    return (1);
+}
+
+// Read a line from stdin with prompt
+static char *read_line_with_prompt(const char *prompt)
+{
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read_len;
+
+    if (isatty(STDIN_FILENO))  // Only show prompt if interactive
+        printf("%s", prompt);
+
+    read_len = getline(&line, &len, stdin);
+    if (read_len == -1) {
+        free(line);
+        return (NULL);  // EOF or error
+    }
+
+    // Remove trailing newline if present
+    if (read_len > 0 && line[read_len - 1] == '\n')
+        line[read_len - 1] = '\0';
+
+    return (line);
+}
+
+// Check if line matches delimiter (exact match)
+static int is_delimiter(const char *line, const char *delimiter)
+{
+    return (strcmp(line, delimiter) == 0);
+}
+
+// Main function to collect heredoc input
+char *collect_heredoc_input(const char *delimiter)
+{
+    t_heredoc *heredoc;
+    char *line;
+    char *result;
+
+    if (!delimiter)
+        return (NULL);
+
+    heredoc = init_heredoc();
+    if (!heredoc)
+        return (NULL);
+
+    // Read lines until delimiter is found
+    while (1) {
+        line = read_line_with_prompt("> ");  // Heredoc prompt
+
+        if (!line) {
+            // EOF reached without finding delimiter
+            fprintf(stderr, "warning: here-document delimited by end-of-file (wanted `%s')\n", delimiter);
+            break;
+        }
+
+        if (is_delimiter(line, delimiter)) {
+            free(line);
+            break;  // Found delimiter, stop collecting
+        }
+
+        if (!append_line(heredoc, line)) {
+            free(line);
+            free(heredoc->content);
+            free(heredoc);
+            return (NULL);  // Memory allocation failed
+        }
+
+        free(line);
+    }
+
+    // Return the collected content
+    result = heredoc->content;
+    free(heredoc);  // Free structure but keep content
+
+    return (result);  // Caller must free this
+}
+
+// Helper function to write heredoc content to a pipe/file descriptor
+int write_heredoc_to_fd(const char *content, int fd)
+{
+    size_t len;
+    ssize_t written;
+
+    if (!content)
+        return (1);
+
+    len = strlen(content);
+    written = write(fd, content, len);
+
+    return (written == (ssize_t)len);
+}
+
+// Example usage function
+void example_usage(void)
+{
+    char *content;
+
+    printf("Enter heredoc content (end with 'EOF'):\n");
+    content = collect_heredoc_input("EOF");
+
+    if (content) {
+        printf("Collected content:\n%s", content);
+        free(content);
+    } else {
+        printf("Failed to collect heredoc\n");
+    }
+}
