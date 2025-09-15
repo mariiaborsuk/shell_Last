@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 23:10:14 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/09/09 22:17:39 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/15 22:43:00 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,18 +15,14 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 
-// void	heredoc_sigint(int signum)
-// {
-// 	(void)signum;
-// 	write(STDOUT_FILENO, "\n", 1);
-// 	g_state |= GOT_SIGINT;
-// }
+
 void heredoc_sigint(int signum)
 {
     (void)signum;
     write(STDOUT_FILENO, "\n", 1);
     exit(130);  // Exit immediately, don't just set flag
 }
+
 
 void	setup_heredoc_signals(void)
 {
@@ -40,96 +36,170 @@ void	setup_heredoc_signals(void)
 	sigaction(SIGQUIT, &sa, NULL);
 }
 
-// int	manage_heredoc(int fd, char *delimiter, t_minishell *shell, int *status)
-// {
-// 	char	*line;
 
-// 	setup_heredoc_signals();
-// 	g_state &= ~GOT_SIGINT;
-// 	while (1)
-// 	{
-// 		write(1, " > ", 4);
-// 		line = get_next_line(STDIN_FILENO);
-// 		if (g_state & GOT_SIGINT)
-// 		{
-// 			shell->exit_status = 130;
-// 			free(line);
-// 			*status=130;
-// 			return 130;
-// 		}
-// 		if (!line)
-// 		{
-// 			shell->exit_status = 1;
-// 			break ;
-// 		}
-// 		if (ft_strncmp(line, delimiter, ft_strlen(delimiter)) == 0
-// 			&& line[ft_strlen(delimiter)] == '\n')
-// 		{
-// 			free(line);
-// 			break ;
-// 		}
-// 		write(fd, line, ft_strlen(line));
-// 		free(line);
-// 	}
-// 	shell->exit_status=0;
-// 	return (0);
+// int manage_heredoc(int fd, char *delimiter, t_minishell *shell, int *status)
+// {
+//     char *line;
+
+//     setup_heredoc_signals();
+//     // Remove g_state check since signal handler exits immediately
+
+//     while (1)
+//     {
+//         write(STDOUT_FILENO, "> ", 2);  // Use STDOUT_FILENO
+//         line = get_next_line(STDIN_FILENO);
+
+//         if (!line)
+//         {
+//             // EOF (Ctrl+D)
+//             shell->exit_status = 0;
+//             break;
+//         }
+
+//         if (ft_strncmp(line, delimiter, ft_strlen(delimiter)) == 0
+//             && line[ft_strlen(delimiter)] == '\n')
+//         {
+//             free(line);
+//             break;
+//         }
+
+//         write(fd, line, ft_strlen(line));
+//         free(line);
+//     }
+// *status=0;
+//     shell->exit_status = 0;
+//     return 0;
 // }
+
+// int manage_heredoc(int fd, char *delimiter, t_minishell *shell, int *status)
+// {
+//     char *line;
+//     int tty_fd;
+
+//     setup_heredoc_signals();
+
+//     // Open terminal directly to bypass pipe redirection
+//     tty_fd = open("/dev/tty", O_RDWR);
+//     if (tty_fd == -1)
+//     {
+//         perror("open /dev/tty");
+//         *status = 1;
+//         return 1;
+//     }
+
+//     while (1)
+//     {
+//         write(tty_fd, "> ", 2);  // Write prompt to terminal
+//         line = get_next_line(tty_fd);  // Read from terminal
+
+//         if (!line)
+//         {
+//             // EOF (Ctrl+D)
+//             write(tty_fd, "\n", 1);  // Add newline after Ctrl+D
+//             shell->exit_status = 0;
+//             break;
+//         }
+
+//         if (ft_strncmp(line, delimiter, ft_strlen(delimiter)) == 0
+//             && line[ft_strlen(delimiter)] == '\n')
+//         {
+//             free(line);
+//             break;
+//         }
+
+//         write(fd, line, ft_strlen(line));  // Write to pipe
+//         free(line);
+//     }
+
+//     close(tty_fd);
+//     *status = 0;
+//     shell->exit_status = 0;
+//     return 0;
+// }
+
+static char *read_line_from_tty(int tty_fd)
+{
+    char *line = NULL;
+    char c;
+    int len = 0;
+    int capacity = 128;
+
+    line = malloc(capacity);
+    if (!line)
+        return NULL;
+
+    while (read(tty_fd, &c, 1) > 0)
+    {
+        if (c == '\n')
+            break;
+
+        if (len >= capacity - 1)
+        {
+            capacity *= 2;
+            char *new_line = realloc(line, capacity);
+            if (!new_line)
+            {
+                free(line);
+                return NULL;
+            }
+            line = new_line;
+        }
+
+        line[len++] = c;
+    }
+
+    line[len] = '\0';
+
+    if (len == 0 && c != '\n')  // EOF without newline
+    {
+        free(line);
+        return NULL;
+    }
+
+    return line;
+}
+
 int manage_heredoc(int fd, char *delimiter, t_minishell *shell, int *status)
 {
     char *line;
+    int tty_fd;
 
     setup_heredoc_signals();
-    // Remove g_state check since signal handler exits immediately
+
+    tty_fd = open("/dev/tty", O_RDWR);
+    if (tty_fd == -1)
+    {
+        *status = 1;
+        return 1;
+    }
 
     while (1)
     {
-        write(STDOUT_FILENO, "> ", 2);  // Use STDOUT_FILENO
-        line = get_next_line(STDIN_FILENO);
+        write(tty_fd, "> ", 2);
+        line = read_line_from_tty(tty_fd);
 
-        if (!line)
+        if (!line)  // EOF
         {
-            // EOF (Ctrl+D)
-            shell->exit_status = 0;
+            write(tty_fd, "\n", 1);
             break;
         }
 
-        if (ft_strncmp(line, delimiter, ft_strlen(delimiter)) == 0
-            && line[ft_strlen(delimiter)] == '\n')
+        if (ft_strcmp(line, delimiter) == 0)
         {
             free(line);
             break;
         }
 
         write(fd, line, ft_strlen(line));
+        write(fd, "\n", 1);  // Add newline
         free(line);
     }
-*status=0;
-    shell->exit_status = 0;
+
+    close(tty_fd);
+    *status = 0;
+	shell->exit_status=0;
     return 0;
 }
-
-// int create_heredoc_pipe(char *delimiter, t_minishell *shell, int *status)
-// {
-//     int pipefd[2];
-//     pid_t pid;
-
-//     if (pipe(pipefd) == -1)
-//         return -1;
-
-//     pid = fork();
-//     if (pid == 0) {
-//         // Child: write to pipe
-//         close(pipefd[0]);
-//         manage_heredoc(pipefd[1], delimiter, shell, status);
-//         close(pipefd[1]);
-//         exit(0);
-//     } else {
-//         // Parent: return read end
-//         close(pipefd[1]);
-//         wait(NULL);
-//         return pipefd[0]; // Use this as stdin for your command
-//     }
-// }
 
 int create_heredoc_pipe(char *delimiter, t_minishell *shell, int *status)
 {
