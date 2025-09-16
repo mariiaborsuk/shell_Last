@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:23:59 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/09/10 17:33:56 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/16 21:08:52 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,6 @@ void		node_with_redir(t_minishell *shell, t_ast *node, t_var **var);
 // int	prepare_heredocs(t_redirect *rlist, t_minishell *sh, int *out_fd);
 int			prepare_heredocs(t_redirect *rlist, t_minishell *sh);
 int create_heredoc_pipe(char *delimiter, t_minishell *shell, int *status);
-int	check_heredoc(t_redirect *head, t_minishell *shell);
+bool	check_heredoc(t_redirect *head, t_minishell *shell);
 
 #endif

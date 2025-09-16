@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 23:11:10 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/09/10 17:31:55 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/16 20:30:29 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,6 +138,6 @@ bool	execute_pipe(t_ast *node, t_var *var, t_minishell *shell)
 		close(STDOUT_FILENO);
 	child_running(&p.status1, p.pid1);
 	child_running(&p.status2, p.pid2);
-	unlink_close(rfd);
+	// unlink_close(rfd);
 	return (true);
 }

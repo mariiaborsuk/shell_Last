@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 23:10:14 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/09/15 22:43:00 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/16 20:37:43 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,7 +159,7 @@ static char *read_line_from_tty(int tty_fd)
     return line;
 }
 
-int manage_heredoc(int fd, char *delimiter, t_minishell *shell, int *status)
+int manage_heredoc(int fd, char *delimiter, int *status)
 {
     char *line;
     int tty_fd;
@@ -191,13 +191,14 @@ int manage_heredoc(int fd, char *delimiter, t_minishell *shell, int *status)
         }
 
         write(fd, line, ft_strlen(line));
-        write(fd, "\n", 1);  // Add newline
+        write(fd, "\n", 1);
         free(line);
     }
 
     close(tty_fd);
     *status = 0;
-	shell->exit_status=0;
+    // DON'T modify shell->exit_status in child!
+    // shell->exit_status = 0;  ← REMOVE THIS
     return 0;
 }
 
@@ -222,7 +223,7 @@ int create_heredoc_pipe(char *delimiter, t_minishell *shell, int *status)
     if (pid == 0) {
         // Child: restore and setup heredoc signals
         close(pipefd[0]);
-        int exit_code = manage_heredoc(pipefd[1], delimiter, shell, status);
+        int exit_code = manage_heredoc(pipefd[1], delimiter,  status);
         close(pipefd[1]);
         exit(exit_code);
     } else {
@@ -246,6 +247,7 @@ int create_heredoc_pipe(char *delimiter, t_minishell *shell, int *status)
         }
 
         *status = 0;
+		shell->exit_status=0;
         return pipefd[0];
     }
 }

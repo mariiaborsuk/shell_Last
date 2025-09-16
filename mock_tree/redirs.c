@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 23:11:35 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/09/10 17:39:14 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/16 22:28:43 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	manage_switch_2(int *ret, t_redirect *head, t_minishell *shell)
 				exit(1);
 			}
 			close(head->fd);
-			unlink("temp.temp");
+			// unlink("temp.temp");
 		}
 	}
 }
@@ -59,39 +59,39 @@ void	manage_switch(int *ret, t_redirect *head, t_minishell *shell)
 		manage_switch_2(ret, head, shell);
 }
 
-int	check_heredoc(t_redirect *head, t_minishell *shell)
-{
-	int	res;
+// int	check_heredoc(t_redirect *head, t_minishell *shell)
+// {
+// 	int	res;
 
-	res = 0;
-	while (head)
-	{
-		if (head->type == heredoc)
-		{
-			head->fd = get_temp_fd(head->file, shell, &res);
-			// if (res == 130)
-			// {
-			// 	free_minishell(shell);
-			// 	_exit(130);
-			// }
-			if (res != 0)
-			{
-				free_minishell(shell);
-				_exit(1);
-			}
-		}
-		head = head->next;
-	}
-	return (0);
-}
+// 	res = 0;
+// 	while (head)
+// 	{
+// 		if (head->type == heredoc)
+// 		{
+// 			head->fd = get_temp_fd(head->file, shell, &res);
+// 			// if (res == 130)
+// 			// {
+// 			// 	free_minishell(shell);
+// 			// 	_exit(130);
+// 			// }
+// 			if (res != 0)
+// 			{
+// 				free_minishell(shell);
+// 				_exit(1);
+// 			}
+// 		}
+// 		head = head->next;
+// 	}
+// 	return (0);
+// }
 int	handle_redir(t_ast *node, t_var *var, t_minishell *shell)
 {
 	t_redirect	*head;
 	t_redirect	*original_head;
-	t_redirect	*heredoc;
+	// t_redirect	*heredoc;
 	int			ret;
 
-	heredoc = node->cmd->redirects;
+	// heredoc = node->cmd->redirects;
 	ret = 0;
 	if (!node || !node->cmd)
 	{
@@ -99,7 +99,7 @@ int	handle_redir(t_ast *node, t_var *var, t_minishell *shell)
 	}
 	head = node->cmd->redirects;
 	original_head = head;
-	check_heredoc(heredoc, shell);
+	// check_heredoc(heredoc, shell);
 	while (head)
 	{
 		if (!head)

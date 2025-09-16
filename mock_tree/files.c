@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 23:06:44 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/08/26 11:06:21 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/16 20:30:45 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,15 +43,15 @@ void	close_files(t_redirect *head)
 	}
 }
 
-void	unlink_close(int rfd)
-{
-	if (rfd > 2)
-	{
-		close(rfd);
-		rfd = -1;
-		unlink("temp.temp");
-	}
-}
+// void	unlink_close(int rfd)
+// {
+// 	if (rfd > 2)
+// 	{
+// 		close(rfd);
+// 		rfd = -1;
+// 		unlink("temp.temp");
+// 	}
+// }
 
 void	cmd_not_found(char *str, t_minishell *shell, char *er)
 {

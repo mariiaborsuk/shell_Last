@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/15 11:04:13 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/08/26 13:51:42 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/16 16:04:40 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ void	replace_relative(t_ast *node, t_minishell *sh)
 
 int	extrern_exit(int status, t_minishell *sh)
 {
+
 	if (WIFSIGNALED(status))
 		sh->exit_status = 128 + WTERMSIG(status);
 	else

@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 21:21:43 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/09/08 21:35:51 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/16 20:30:34 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,23 +32,23 @@ char	*if_heredoc(t_cmd *cmd)
 	return (heredoc_del);
 }
 
-void	rfd_invalid(t_minishell *shell)
-{
-	free_minishell(shell);
-	perror("open for read");
-	unlink("temp.temp");
-	exit(1);
-}
+// void	rfd_invalid(t_minishell *shell)
+// {
+// 	free_minishell(shell);
+// 	perror("open for read");
+// 	unlink("temp.temp");
+// 	exit(1);
+// }
 
-void	wfd_invalid(int wfd, t_minishell *shell)
-{
-	if (wfd == -1)
-	{
-		perror("open temp file for writing");
-		free_minishell(shell);
-		exit(1);
-	}
-}
+// void	wfd_invalid(int wfd, t_minishell *shell)
+// {
+// 	if (wfd == -1)
+// 	{
+// 		perror("open temp file for writing");
+// 		free_minishell(shell);
+// 		exit(1);
+// 	}
+// }
 
 int	get_temp_fd(char *delimiter, t_minishell *shell, int *status)
 {

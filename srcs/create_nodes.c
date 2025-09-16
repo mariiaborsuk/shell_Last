@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 12:53:23 by akovalch          #+#    #+#             */
-/*   Updated: 2025/08/21 01:38:03 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/16 22:25:15 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,5 +70,6 @@ t_redirect	*create_redirect(t_redir_type type, char *file)
 	new_redirect->next = NULL;
 	new_redirect->open = 0;
 	new_redirect->fd = -1;
+	 new_redirect->collected = false;
 	return (new_redirect);
 }

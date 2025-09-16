@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 15:47:32 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/08/25 21:17:16 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/16 15:04:35 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ typedef struct s_redirect
 	char				*file;
 	int					fd;
 	int					open;
+	bool				collected;
 	struct s_redirect	*next;
 }						t_redirect;
 

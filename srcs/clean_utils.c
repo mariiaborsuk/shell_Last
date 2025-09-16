@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/16 10:37:17 by akovalch          #+#    #+#             */
-/*   Updated: 2025/08/21 01:47:01 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/16 20:48:53 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,28 +31,63 @@ void	free_list(t_token **token)
 	*token = NULL;
 }
 
-void	free_redirect(t_redirect **redirects)
-{
-	t_redirect	*temp;
-	t_redirect	*cur;
+// void	free_redirect(t_redirect **redirects)
+// {
+// 	t_redirect	*temp;
+// 	t_redirect	*cur;
 
-	if (!redirects || !*redirects)
-		return ;
-	cur = *redirects;
-	while (cur)
-	{
-		temp = cur->next;
-		if (cur->fd != -1 && cur->open == 1 && cur->fd > 2)
-		{
-			close(cur->fd);
-			cur->open = 0;
-			cur->fd = -1;
-		}
-		if (cur->file)
-			free_and_null((void **)&cur->file);
-		free_and_null((void **)&cur);
-		cur = temp;
-	}
+// 	if (!redirects || !*redirects)
+// 		return ;
+// 	cur = *redirects;
+// 	while (cur)
+// 	{
+// 		temp = cur->next;
+// 		if (cur->fd != -1 && cur->open == 1 && cur->fd > 2)
+// 		{
+// 			close(cur->fd);
+// 			cur->open = 0;
+// 			cur->fd = -1;
+// 		}
+// 		if (cur->file)
+// 			free_and_null((void **)&cur->file);
+// 		free_and_null((void **)&cur);
+// 		cur = temp;
+// 	}
+// }
+void free_redirect(t_redirect **redirect)
+{
+    t_redirect *current = *redirect;  // Get the actual list head
+    t_redirect *next;
+
+    // printf("DEBUG: free_redirect called with redirect=%p, *redirect=%p\n",
+    //        (void*)redirect, (void*)*redirect);
+
+    while (current)
+    {
+        // // printf("DEBUG: Freeing redirect %p, next=%p\n",
+        //        (void*)current, (void*)current->next);
+
+        // Add bounds checking
+        if ((uintptr_t)current < 0x1000)
+        {
+            // printf("ERROR: Corrupted redirect pointer detected: %p\n", (void*)current);
+            break;
+        }
+
+        if (current->next && (uintptr_t)current->next < 0x1000)
+        {
+            // printf("ERROR: Corrupted next pointer detected: %p\n", (void*)current->next);
+            break;
+        }
+
+        next = current->next;     // Now this works correctly
+        if (current->file)
+            free(current->file);
+        free(current);
+        current = next;
+    }
+
+    *redirect = NULL;  // Clear the original pointer
 }
 
 void	free_argv(char ***argv)
