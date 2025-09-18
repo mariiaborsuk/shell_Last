@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 23:10:14 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/09/16 20:37:43 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/17 22:49:41 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,7 +164,7 @@ int manage_heredoc(int fd, char *delimiter, int *status)
     char *line;
     int tty_fd;
 
-    setup_heredoc_signals();
+    // setup_heredoc_signals();
 
     tty_fd = open("/dev/tty", O_RDWR);
     if (tty_fd == -1)
@@ -207,17 +207,17 @@ int create_heredoc_pipe(char *delimiter, t_minishell *shell, int *status)
     int pipefd[2];
     pid_t pid;
     int child_status;
-    struct sigaction old_sigint;
+    // struct sigaction old_sigint;
 
     if (pipe(pipefd) == -1)
         return -1;
 
-    // Disable parent's SIGINT handler during heredoc
-    struct sigaction ignore_sigint;
-    ignore_sigint.sa_handler = SIG_IGN;
-    ignore_sigint.sa_flags = 0;
-    sigemptyset(&ignore_sigint.sa_mask);
-    sigaction(SIGINT, &ignore_sigint, &old_sigint);
+    // // Disable parent's SIGINT handler during heredoc
+    // struct sigaction ignore_sigint;
+    // ignore_sigint.sa_handler = SIG_IGN;
+    // ignore_sigint.sa_flags = 0;
+    // sigemptyset(&ignore_sigint.sa_mask);
+    // sigaction(SIGINT, &ignore_sigint, &old_sigint);
 
     pid = fork();
     if (pid == 0) {
@@ -232,22 +232,24 @@ int create_heredoc_pipe(char *delimiter, t_minishell *shell, int *status)
         waitpid(pid, &child_status, 0);
 
         // RESTORE parent's original SIGINT handler
-        sigaction(SIGINT, &old_sigint, NULL);
+        // sigaction(SIGINT, &old_sigint, NULL);
 
-        // Clear any signal state contamination
-        g_state &= ~GOT_SIGINT;
+        // // Clear any signal state contamination
+        // g_state &= ~GOT_SIGINT;
 
-        if (WIFEXITED(child_status)) {
-            int exit_code = WEXITSTATUS(child_status);
-            if (exit_code == 130) {
-                *status = 130;
-                close(pipefd[0]);
-                return -1;
-            }
-        }
+        // if (WIFEXITED(child_status)) {
+        //     int exit_code = WEXITSTATUS(child_status);
+        //     if (exit_code == 130) {
+        //         *status = 130;
+        //         close(pipefd[0]);
+        //         return -1;
+        //     }
+        // }
 
         *status = 0;
-		shell->exit_status=0;
+		// shell->exit_status=0;
+			child_running(&child_status, pid);
+	extrern_exit(child_status, shell);
         return pipefd[0];
     }
 }
