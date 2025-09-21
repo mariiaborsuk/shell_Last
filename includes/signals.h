@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/12 15:47:08 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/08/28 22:44:34 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/19 23:43:25 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,12 @@
 # include <stdbool.h>
 # include <sys/wait.h>
 # include <unistd.h>
-# define CHILD_RUNNING 1u
+// # define CHILD_RUNNING 1u
 # define NEED_REDISPLAY 2u
-# define GOT_SIGINT 4u
-# define IN_HEREDOC 1
+// # define GOT_SIGINT 4u
+// # define IN_HEREDOC 1
+#define CHILD_RUNNING  (1u << 0)
+#define GOT_SIGINT     (1u << 1)
 
 void		parent_sigint(int signum);
 void		handle_sigint(int signum);
@@ -34,5 +36,6 @@ void		signal_reset_prompt(int signo);
 void		signal_print_newline(int signal);
 void		ignore_sigquit(void);
 extern int	g_state;
+extern int global;
 
 #endif

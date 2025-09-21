@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 13:06:14 by akovalch          #+#    #+#             */
-/*   Updated: 2025/08/13 13:57:59 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/20 00:09:54 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ bool	lexing(t_minishell *shell, char *line, char **envp)
 		if (!(handle_token(&shell->tokens, line, &i)))
 			return (false);
 	}
-	if (!expand_tokens(shell->tokens, envp, shell->exit_status)
+	if (!expand_tokens(shell->tokens, envp, global)
 		|| !join_str(&shell->tokens))
 	{
 		free_list(&shell->tokens);
