@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 23:10:14 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/09/21 23:22:02 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/23 22:07:40 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -280,88 +280,128 @@ void setup_heredoc_signals(void)
     sigaction(SIGQUIT, &sa, NULL);
 }
 
-static char *read_line_from_tty(int tty_fd)
+// static char *read_line_from_tty(int tty_fd)
+// {
+//     char *line = NULL;
+//     char c;
+//     int len = 0;
+//     int capacity = 128;
+
+//     line = malloc(capacity);
+//     if (!line)
+//         return NULL;
+
+//     while (read(tty_fd, &c, 1) > 0)
+//     {
+//         if (c == '\n')
+//             break;
+
+//         if (len >= capacity - 1)
+//         {
+//             capacity *= 2;
+//             char *new_line = realloc(line, capacity);
+//             if (!new_line)
+//             {
+//                 free(line);
+//                 return NULL;
+//             }
+//             line = new_line;
+//         }
+
+//         line[len++] = c;
+//     }
+
+//     line[len] = '\0';
+
+//     if (len == 0 && c != '\n')  // EOF without newline
+//     {
+//         free(line);
+//         return NULL;
+//     }
+
+//     return line;
+// }
+
+// int manage_heredoc(int fd, char *delimiter, int *status)
+// {
+//     char *line;
+//     int tty_fd;
+
+//     // UNCOMMENT THIS - Essential for SIGINT detection!
+//     setup_heredoc_signals();
+
+//     tty_fd = open("/dev/tty", O_RDWR);
+//     if (tty_fd == -1)
+//     {
+//         *status = 1;
+//         return 1;
+//     }
+
+//     while (1)
+//     {
+//         write(tty_fd, "> ", 2);
+//         line = read_line_from_tty(tty_fd);
+
+//         if (!line)  // EOF (Ctrl+D)
+//         {
+//             write(tty_fd, "\n", 1);
+//             break;
+//         }
+
+//         if (ft_strcmp(line, delimiter) == 0)
+//         {
+//             free(line);
+//             break;
+//         }
+
+//         write(fd, line, ft_strlen(line));
+//         write(fd, "\n", 1);
+//         free(line);
+//     }
+
+//     close(tty_fd);
+//     *status = 0;
+//     return 0;
+// }
+int manage_heredoc(int fd,  char *delimiter, t_minishell *shell)
 {
-    char *line = NULL;
-    char c;
-    int len = 0;
-    int capacity = 128;
+    int tty = open("/dev/tty", O_RDWR);
+	 setup_heredoc_signals();
+    if (tty == -1) tty = STDIN_FILENO;
 
-    line = malloc(capacity);
-    if (!line)
-        return NULL;
+    for (;;) {
+        if (isatty(tty)) write(tty, "> ", 2);
 
-    while (read(tty_fd, &c, 1) > 0)
-    {
-        if (c == '\n')
-            break;
-
-        if (len >= capacity - 1)
-        {
-            capacity *= 2;
-            char *new_line = realloc(line, capacity);
-            if (!new_line)
-            {
-                free(line);
-                return NULL;
-            }
-            line = new_line;
-        }
-
-        line[len++] = c;
-    }
-
-    line[len] = '\0';
-
-    if (len == 0 && c != '\n')  // EOF without newline
-    {
-        free(line);
-        return NULL;
-    }
-
-    return line;
-}
-
-int manage_heredoc(int fd, char *delimiter, int *status)
-{
-    char *line;
-    int tty_fd;
-
-    // UNCOMMENT THIS - Essential for SIGINT detection!
-    setup_heredoc_signals();
-
-    tty_fd = open("/dev/tty", O_RDWR);
-    if (tty_fd == -1)
-    {
-        *status = 1;
-        return 1;
-    }
-
-    while (1)
-    {
-        write(tty_fd, "> ", 2);
-        line = read_line_from_tty(tty_fd);
-
-        if (!line)  // EOF (Ctrl+D)
-        {
-            write(tty_fd, "\n", 1);
+        char *line = get_next_line(tty);
+        if (!line) {
+            // EOF (Ctrl-D) — optional warning:
+            // dprintf(STDERR_FILENO, "warning: here-document delimited by end-of-file (wanted '%s')\n", delim);
             break;
         }
 
-        if (ft_strcmp(line, delimiter) == 0)
-        {
-            free(line);
-            break;
-        }
+        // strip trailing '\n'
+        size_t len = ft_strlen(line);
+        if (len && line[len - 1] == '\n') line[--len] = '\0';
 
-        write(fd, line, ft_strlen(line));
+        // end delimiter?
+        if (ft_strcmp(line, delimiter) == 0) { free(line); break; }
+
+        // if (expand) {
+        //     // your expansion helper (make sure it can realloc/replace 'line')
+        //     get_val(&line, shell->var); // or expand_vars_in_place(&line, env)
+        //     len = ft_strlen(line);
+        // }
+		if (!check_quote(shell->tokens))
+			get_val(&line, shell->var);
+
+        // write line + newline to heredoc temp/pipe
+        write(fd, line, len);
         write(fd, "\n", 1);
         free(line);
     }
 
-    close(tty_fd);
-    *status = 0;
-    return 0;
+    if (tty != STDIN_FILENO) close(tty);
+    return 0; // child will _exit(0) unless SIGINT handler _exit(130) fires
 }
 
 int create_heredoc_pipe(char *delimiter, t_minishell *shell, int *status)
@@ -385,7 +425,7 @@ int create_heredoc_pipe(char *delimiter, t_minishell *shell, int *status)
     if (pid == 0) {
         // Child process: setup signals and handle heredoc
         close(pipefd[0]);
-        int exit_code = manage_heredoc(pipefd[1], delimiter, status);
+        int exit_code = manage_heredoc(pipefd[1], delimiter, shell);
         close(pipefd[1]);
         exit(exit_code);  // Child will exit with 130 if SIGINT received
     } else {
@@ -441,3 +481,42 @@ int create_heredoc_pipe(char *delimiter, t_minishell *shell, int *status)
         return pipefd[0];
     }
 }
+
+// // ********************************************************************************************************
+// int manage_heredoc(int wfd, const char *delim /* parsed, unquoted form */, bool expand, t_minishell *shell)
+// {
+//     int tty = open("/dev/tty", O_RDWR);
+//     if (tty == -1) tty = STDIN_FILENO;
+
+//     for (;;) {
+//         if (isatty(tty)) write(tty, "> ", 2);
+
+//         char *line = get_next_line(tty);
+//         if (!line) {
+//             // EOF (Ctrl-D) — optional warning:
+//             // dprintf(STDERR_FILENO, "warning: here-document delimited by end-of-file (wanted '%s')\n", delim);
+//             break;
+//         }
+
+//         // strip trailing '\n'
+//         size_t len = ft_strlen(line);
+//         if (len && line[len - 1] == '\n') line[--len] = '\0';
+
+//         // end delimiter?
+//         if (ft_strcmp(line, delim) == 0) { free(line); break; }
+
+//         if (expand) {
+//             // your expansion helper (make sure it can realloc/replace 'line')
+//             get_val(&line, shell->var); // or expand_vars_in_place(&line, env)
+//             len = ft_strlen(line);
+//         }
+
+//         // write line + newline to heredoc temp/pipe
+//         write(wfd, line, len);
+//         write(wfd, "\n", 1);
+//         free(line);
+//     }
+
+//     if (tty != STDIN_FILENO) close(tty);
+//     return 0; // child will _exit(0) unless SIGINT handler _exit(130) fires
+// }
