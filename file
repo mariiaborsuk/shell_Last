@@ -1,0 +1,74 @@
+use execve called
+use execve called
+# SAN ?= 0
+CC = cc
+CFLAGS = -Wall -Wextra -Werror -g -O0
+# LDFLAGS=
+RM = rm -f
+LIBS = -lreadline
+
+NAME = minishell
+# ifeq ($(SAN),1)
+# SAN_FLAGS = -fsanitize=address -fsanitize=undefined
+# CFLAGS   += $(SAN_FLAGS)
+# LDFLAGS  += $(SAN_FLAGS)
+# endif
+SRCS = srcs/main.c srcs/prompt.c srcs/add_nodes.c srcs/create_nodes.c  srcs/lexing.c \
+srcs/clean.c srcs/clean_utils.c srcs/create_token.c srcs/create_token_redirect.c srcs/expand_var.c srcs/expand_var_utils.c \
+srcs/parsing.c srcs/build_redirect.c srcs/validation.c srcs/validation_utils.c srcs/utils.c mock_tree/exec.c mock_tree/execute.c \
+mock_tree/heredoc.c mock_tree/redirs.c mock_tree/pipes.c mock_tree/variables.c mock_tree/unset.c mock_tree/export.c \
+mock_tree/var_helpers.c mock_tree/free_var.c mock_tree/replace_subs.c mock_tree/replace_var.c mock_tree/add_vars.c\
+mock_tree/files.c mock_tree/in_out.c mock_tree/handle_exec.c mock_tree/cd_builtins.c mock_tree/builtins.c mock_tree/execute_utils.c mock_tree/signal.c\
+mock_tree/execute_utils_2.c mock_tree/heredoc_utils.c mock_tree/utils_functions.c
+
+
+OBJS = $(SRCS:.c=.o)
+
+LIBFT_DIR = libs/Libft
+LIBFT = $(LIBFT_DIR)/libft.a
+
+all: $(NAME)
+
+$(LIBFT):
+	@make -s -C $(LIBFT_DIR)
+	@echo "\033[1;32mCompiling $(NAME)...\033[0m"
+
+$(NAME): $(OBJS) $(LIBFT)
+	@$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(LIBS) -o $(NAME)
+	@echo "\033[1;34m"
+	@echo "                                                                     "
+	@echo " ███    ███ ██ ███    ██ ██ ███████ ██   ██ ███████ ██      ██       "
+	@echo " ████  ████ ██ ████   ██ ██ ██      ██   ██ ██      ██      ██       "
+	@echo " ██ ████ ██ ██ ██ ██  ██ ██ ███████ ███████ █████   ██      ██       "
+	@echo " ██  ██  ██ ██ ██  ██ ██ ██      ██ ██   ██ ██      ██      ██       "
+	@echo " ██      ██ ██ ██   ████ ██ ███████ ██   ██ ███████ ███████ ███████  "
+	@echo "                                                                     "
+	@echo "\033[0m"
+	@echo "\033[1;33m$(NAME) compiled successfully\033[0m"
+
+# $(NAME): $(OBJS) $(LIBFT)
+# 	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(LIBS) $(LDFLAGS) -o $(NAME)
+# 	@echo "linked successfully"
+
+
+# %.o: %.c
+# 	@$(CC) $(CFLAGS) -c $< -o $@
+# 	@echo "compiled successfully"
+%.o: %.c
+	@$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	@$(RM) $(OBJS)
+	@make -C $(LIBFT_DIR) clean
+	@echo "\033[1;35mRemoved object files from $(NAME)\033[0m"
+
+fclean:
+	@$(RM) $(NAME)
+	@make -C $(LIBFT_DIR) fclean
+	@echo "\033[1;36mRemoved $(NAME) and $(LIBFT)\033[0m"
+
+
+re: clean fclean all
+
+.PHONY: all clean fclean re
+hffhfh

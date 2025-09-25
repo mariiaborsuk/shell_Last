@@ -6,14 +6,14 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 13:06:14 by akovalch          #+#    #+#             */
-/*   Updated: 2025/09/20 00:09:54 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/24 16:57:41 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-bool	token_constructor(enum e_token_type type, t_token **token,
-		char *str, t_token_info info)
+bool	token_constructor(enum e_token_type type, t_token **token, char *str,
+		t_token_info info)
 {
 	char	*value;
 	t_token	*new_node;
@@ -86,8 +86,13 @@ bool	handle_token(t_token **tokens, char *str, int *i)
 
 bool	lexing(t_minishell *shell, char *line, char **envp)
 {
-	int		i;
+	int	i;
+	int	exit_code;
 
+	if (g_state == 2)
+		exit_code = 130;
+	else
+		exit_code = shell->exit_status;
 	i = 0;
 	if (!line)
 		return (false);
@@ -96,7 +101,7 @@ bool	lexing(t_minishell *shell, char *line, char **envp)
 		if (!(handle_token(&shell->tokens, line, &i)))
 			return (false);
 	}
-	if (!expand_tokens(shell->tokens, envp, global)
+	if (!expand_tokens(shell->tokens, envp, exit_code)
 		|| !join_str(&shell->tokens))
 	{
 		free_list(&shell->tokens);

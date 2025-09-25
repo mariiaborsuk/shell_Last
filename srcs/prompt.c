@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 11:56:21 by akovalch          #+#    #+#             */
-/*   Updated: 2025/09/21 23:41:03 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/25 16:43:57 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,9 +180,11 @@ bool collect_heredocs_for_command(t_redirect *redirects, t_minishell *shell)
             {
                 // Set global status to indicate interruption
                 global = status;
+				shell->exit_status=status;
                 return false;
             }
             current->collected = true;
+			shell->exit_status=status;
             global = status;
         }
         current = current->next;
@@ -219,7 +221,6 @@ bool shell_read_loop(t_minishell *shell)
 
     while (1)
     {
-        // Handle any pending signal state
         if_g_state(shell);
 
         if (!handle_envp(shell))
@@ -242,7 +243,7 @@ bool shell_read_loop(t_minishell *shell)
             if (!collect_all_heredocs(shell->ast, shell))
             {
                 // Check if it was interrupted by Ctrl+C
-                if (global == 130)
+                if (shell->exit_status == 130)
                 {
                     shell->exit_status = 130;
                     global = 0;  // Reset global state

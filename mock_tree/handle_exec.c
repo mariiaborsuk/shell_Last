@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 23:07:20 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/09/17 22:30:54 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/25 12:09:19 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	execute_built_in(char **cmd, t_var **var, t_minishell *shell)
 	int		result;
 
 	if (ft_strcmp(cmd[0], "cd") == 0)
-		return (cd_fns(cmd));
+		return(cd_fns(cmd, shell));
 	if (ft_strcmp(cmd[0], "env") == 0)
 	{
 		local_envp = convert_var_to_envp(var);
@@ -68,6 +68,7 @@ int	handle_commands(t_var *var, t_minishell *shell, t_redirect *original_head,
 	else
 		{
 			rc = execute_built_in(node->cmd->argv, &var, shell);
+			shell->exit_status=rc;
 		}
 	if (original_head != NULL)
 		close_files(original_head);

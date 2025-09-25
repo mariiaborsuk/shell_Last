@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:23:59 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/09/16 21:08:52 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/25 15:53:15 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ t_var		*make_var_from_envp(char *envp_row);
 int			open_std_in(t_redirect **f_str);
 int			redirect_stdout_append(t_redirect **f_str);
 int			get_home_dir(void);
-int			cd_fns(char **argv);
+int			cd_fns(char **argv, t_minishell *shell);
 int			print_env(char **envp);
 int			cmd_pwd(void);
 int			argv_len(char **argv);
@@ -80,6 +80,7 @@ int			handle_commands(t_var *var, t_minishell *shell,
 void		execute_cmd(t_ast *node, t_var **var, t_minishell *shell);
 void		manage_cmd(t_ast *node, t_var *var, t_minishell *shell);
 int			check_quote(t_token *tokens);
+// void		handle_status(int status, pid_t pid, t_minishell *shell);
 void		handle_status(int status, pid_t pid, t_minishell *shell);
 char		*ft_implode(char **array);
 void		get_cur_val(t_var *head, char *var_name, char **name,

@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 12:31:27 by akovalch          #+#    #+#             */
-/*   Updated: 2025/09/21 23:18:41 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/24 14:52:12 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	parent_sigint(int signum)
 	(void)signum;
 	write(STDOUT_FILENO, "\n", 1);
 	g_state |= GOT_SIGINT;
-	global=130;
+	// global=130;
 	if (!(g_state & CHILD_RUNNING))
 	{
 	 rl_replace_line("", 0);

@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 22:09:44 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/08/26 12:35:04 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/25 16:40:05 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int	get_old_dir(void)
 	}
 }
 
-int	get_dir(char **argv)
+int	get_dir(char **argv, t_minishell *shell)
 {
 	struct stat	info;
 
@@ -46,17 +46,19 @@ int	get_dir(char **argv)
 		else
 		{
 			ft_putendl_fd(" No such file or directory", 2);
+			shell->exit_status=1;
 			return (1);
 		}
 	}
 	else
 	{
 		ft_putendl_fd(" No such file or directory", 2);
+		shell->exit_status=1;
 		return (1);
 	}
 }
 
-int	cd_fns(char **argv)
+int	cd_fns(char **argv, t_minishell *shell)
 {
 	int	result;
 
@@ -72,7 +74,7 @@ int	cd_fns(char **argv)
 	else if (ft_strcmp(".", argv[1]) == 0)
 		result = 0;
 	else if (ft_strlen(argv[1]) > 1)
-		result = (get_dir(argv));
+		result = (get_dir(argv,shell) );
 	return (result);
 }
 

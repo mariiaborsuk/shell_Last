@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 23:11:10 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/09/16 20:30:29 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/25 16:39:13 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,16 @@ void	handle_status(int status, pid_t pid, t_minishell *shell)
 	else if (WIFSIGNALED(status))
 		shell->exit_status = 128 + WTERMSIG(status);
 }
+// void handle_status(int status, pid_t pid, t_minishell *shell)
+// {
+//     int status1;
+// printf("status %d\n", status);
+//     waitpid(pid, &status1, 0);
+//     if (WIFEXITED(status1))
+//         shell->exit_status = WEXITSTATUS(status1);
+//     else if (WIFSIGNALED(status1))
+//         shell->exit_status = 128 + WTERMSIG(status1);
+// }
 
 t_ast	*get_leftmost_command(t_ast *node)
 {
@@ -72,8 +82,9 @@ bool	handle_right_child(t_process p, t_ast *node, t_minishell *shell,
 			manage_cmd(node, var, shell);
 		if (g_state == 2)
 			shell->exit_status = 130;
+		int status=shell->exit_status;
 		free_minishell(shell);
-		exit(shell->exit_status);
+		exit(status);
 	}
 	return (true);
 }
@@ -111,8 +122,9 @@ void	manage_left_child(t_process p, int rfd, t_ast *node, t_minishell *shell)
 			manage_cmd(node, shell->var, shell);
 		if (g_state == 2)
 			shell->exit_status = 130;
+		int status=shell->exit_status;
 		free_minishell(shell);
-		exit(shell->exit_status);
+		exit(status);
 	}
 }
 
@@ -138,6 +150,10 @@ bool	execute_pipe(t_ast *node, t_var *var, t_minishell *shell)
 		close(STDOUT_FILENO);
 	child_running(&p.status1, p.pid1);
 	child_running(&p.status2, p.pid2);
+	if (WIFEXITED(p.status2))
+       {shell->exit_status = WEXITSTATUS(p.status2);}
+    else if (WIFSIGNALED(p.status2))
+        {shell->exit_status = 128 + WTERMSIG(p.status2);}
 	// unlink_close(rfd);
 	return (true);
 }

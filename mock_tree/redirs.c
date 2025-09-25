@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 23:11:35 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/09/16 22:28:43 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/25 15:56:36 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	manage_switch_2(int *ret, t_redirect *head, t_minishell *shell)
 				exit(1);
 			}
 			close(head->fd);
-			// unlink("temp.temp");
+
 		}
 	}
 }
@@ -84,35 +84,61 @@ void	manage_switch(int *ret, t_redirect *head, t_minishell *shell)
 // 	}
 // 	return (0);
 // }
-int	handle_redir(t_ast *node, t_var *var, t_minishell *shell)
-{
-	t_redirect	*head;
-	t_redirect	*original_head;
-	// t_redirect	*heredoc;
-	int			ret;
+// int	handle_redir(t_ast *node, t_var *var, t_minishell *shell)
+// {
+// 	t_redirect	*head;
+// 	t_redirect	*original_head;
+// 	// t_redirect	*heredoc;
+// 	int			ret;
 
-	// heredoc = node->cmd->redirects;
-	ret = 0;
-	if (!node || !node->cmd)
-	{
-		return (0);
-	}
-	head = node->cmd->redirects;
-	original_head = head;
-	// check_heredoc(heredoc, shell);
-	while (head)
-	{
-		if (!head)
-			break ;
-		manage_switch(&ret, head, shell);
-		if (ret == 1)
-			{
-				free_minishell(shell);
-				exit(1);
-			}
-		head = head->next;
-	}
-	return (handle_commands(var, shell, original_head, node));
+// 	// heredoc = node->cmd->redirects;
+// 	ret = 0;
+// 	if (!node || !node->cmd)
+// 	{
+// 		return (0);
+// 	}
+// 	head = node->cmd->redirects;
+// 	original_head = head;
+// 	// check_heredoc(heredoc, shell);
+// 	while (head)
+// 	{
+// 		manage_switch(&ret, head, shell);
+// 		if (ret == 1)
+// 			{
+// 				free_minishell(shell);
+// 				exit(1);
+// 			}
+// 		head = head->next;
+// 	}
+// 	return (handle_commands(var, shell, original_head, node));
+// }
+int handle_redir(t_ast *node, t_var *var, t_minishell *shell)
+{
+    t_redirect *head;
+    t_redirect *original_head;
+    int ret;
+
+    ret = 0;
+    if (!node || !node->cmd)
+        return (0);
+
+    head = node->cmd->redirects;
+    original_head = head;
+
+    while (head)
+    {
+        manage_switch(&ret, head, shell);
+        if (ret == 1)
+        {
+            // Close any opened files before returning
+            if (original_head != NULL)
+                close_files(original_head);
+            exit (1);  // Return error status
+        }
+        head = head->next;
+    }
+
+    return (handle_commands(var, shell, original_head, node));
 }
 
 void	node_with_redir(t_minishell *shell, t_ast *node, t_var **var)
