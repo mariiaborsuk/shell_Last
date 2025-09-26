@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 23:12:48 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/08/26 23:34:20 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/26 15:48:15 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ char	*get_replace(const char *name)
 
 	dollar_pos = ft_strchr(name, '$');
 	i = 0;
-	while (dollar_pos[i] != '}' && dollar_pos[i] != '\0' && dollar_pos[i] != 39
+	while (dollar_pos[i] != '}' && dollar_pos[i] != '\0' && dollar_pos[i] != 39 && dollar_pos[i] !=' '
 		&& dollar_pos[i] != 34)
 		i++;
 	replace = malloc(i + 2);
