@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 13:06:14 by akovalch          #+#    #+#             */
-/*   Updated: 2025/09/24 16:57:41 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/27 21:42:50 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,9 +90,13 @@ bool	lexing(t_minishell *shell, char *line, char **envp)
 	int	exit_code;
 
 	if (g_state == 2)
-		exit_code = 130;
+		{exit_code = 130;
+		// printf("^C is pressed");
+	}
 	else
-		exit_code = shell->exit_status;
+		{exit_code = shell->exit_status;
+			// printf("NOT PRESSED\n");
+		}
 	i = 0;
 	if (!line)
 		return (false);

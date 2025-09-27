@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 23:12:25 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/09/26 15:46:17 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/26 20:40:32 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,8 +116,6 @@ void	get_val(char **name, t_var *head)
 			return ;
 		filtered_name = remove_braces(*name);
 		var_name = get_var_name(replace);
-		printf("VAR_NAME: %s\n", var_name);
-			printf("REPLACE: %s\n", replace);
 		if (var_name == NULL)
 		{
 			free(replace);
