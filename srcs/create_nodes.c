@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 12:53:23 by akovalch          #+#    #+#             */
-/*   Updated: 2025/09/16 22:25:15 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/28 20:22:50 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,41 @@ t_token	*create_node(t_token_type type, char *value)
 	new_node->next = NULL;
 	return (new_node);
 }
+// bool first_token_is_comment(t_token *tokens)
+// {
+//     if (!tokens)
+//         return false;
 
+//     // Check if first token is a word token that starts with '#'
+//     if (tokens->type == token_word && tokens->value && tokens->value[0] == '#')
+//         return true;
+
+//     return false;
+// }
+bool first_token_is_comment(t_token *tokens)
+{
+    t_token *current;
+
+    if (!tokens)
+        return false;
+
+    current = tokens;
+
+    // Skip to first non-null token if needed
+    while (current && !current->value)
+        current = current->next;
+
+    if (!current)
+        return false;
+
+    // Check if it's a word token starting with '#'
+    if (current->type == token_word &&
+        current->value &&
+        current->value[0] == '#')
+        return true;
+
+    return false;
+}
 t_cmd	*create_cmd(t_token **tokens)
 {
 	t_cmd	*cmd;
@@ -36,6 +70,11 @@ t_cmd	*create_cmd(t_token **tokens)
 	cmd = malloc(sizeof(t_cmd));
 	if (!cmd)
 		return (NULL);
+	if (first_token_is_comment(*tokens)) {
+    // Don't build command - it's a comment line
+    // shell->exit_status = 0;
+    return NULL; // or however you indicate no command
+}
 	if (!build_cmd(tokens, &cmd->argv, &cmd->redirects))
 	{
 		free_cmd(&cmd);

@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 15:23:46 by akovalch          #+#    #+#             */
-/*   Updated: 2025/09/16 22:25:37 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/28 19:27:32 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,21 +47,7 @@ bool	handle_redirect(t_token **tokens, t_redirect **redirects)
 	*tokens = (*tokens)->next;
 	return (true);
 }
-void debug_redirect_linking(t_redirect *head)
-{
-    t_redirect *current = head;
-    int count = 0;
 
-    printf("DEBUG: Redirect list structure:\n");
-    while (current)
-    {
-        printf("  [%d] redirect=%p, type=%d, file='%s', next=%p\n",
-               count++, (void*)current, current->type,
-               current->file ? current->file : "NULL", (void*)current->next);
-        current = current->next;
-    }
-    printf("DEBUG: Total linked redirects: %d\n", count);
-}
 
 bool	handle_cmd(t_token **tokens, t_redirect **redirects,
 	char **argv, int *i)
