@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 14:30:17 by akovalch          #+#    #+#             */
-/*   Updated: 2025/09/27 19:20:24 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/28 16:47:58 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ typedef struct s_read_buffer
 	int		should_return;
 }			t_read_buffer;
 
-
+char	*get_line_loop(int fd, t_line *line, t_buffer *buffer);
 void	free_buffer(t_buffer *buffer)
 {
 	if (buffer->content)

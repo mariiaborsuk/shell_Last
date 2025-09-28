@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 23:10:14 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/09/27 20:33:07 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/28 18:43:16 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,9 @@ void heredoc_sigint(int signum)
 {
     (void)signum;
     write(STDOUT_FILENO, "\n", 1);
+	g_state=3;
     // Don't print prompt here - let parent handle it
-    exit(130);  // Exit with 130 to indicate SIGINT termination
+    // exit(130);  // Exit with 130 to indicate SIGINT termination
 }
 
 void setup_heredoc_signals(void)
@@ -231,7 +232,11 @@ int manage_heredoc(int fd, char *delimiter, t_minishell *shell)
 
     while (1) {
         char *line = read_line_from_fd(tty);
-
+		if(g_state==3)
+		{
+			free_minishell(shell);
+			exit(130);
+		}
         if (!line) {
             // EOF (^D) was pressed
             if (isatty(tty)) {
