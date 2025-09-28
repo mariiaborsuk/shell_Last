@@ -115,6 +115,7 @@ void	use_execve(char **ar, char *envp[], t_minishell *shell)
 	if (execve(path, ar, envp) == -1)
 	{
 		perror("execve");
+		free_argv(&paths_ar);
 		free_minishell(shell);
 		exit(126);
 	}

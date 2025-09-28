@@ -101,8 +101,14 @@ bool	lexing(t_minishell *shell, char *line, char **envp)
 	while (line[i])
 	{
 		if (!(handle_token(&shell->tokens, line, &i)))
+		{
+			shell->exit_status = 2;
 			return (false);
+		}
 	}
+	// Check if input was empty (only whitespace)
+	if (shell->tokens == NULL)
+		return (true);
 	if (!expand_tokens(shell->tokens, envp, exit_code)
 		|| !join_str(&shell->tokens))
 	{
@@ -111,6 +117,7 @@ bool	lexing(t_minishell *shell, char *line, char **envp)
 	}
 	if (!is_valid(&shell->tokens))
 	{
+		shell->exit_status = 2;
 		free_list(&shell->tokens);
 		return (false);
 	}

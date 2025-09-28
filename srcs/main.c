@@ -63,9 +63,10 @@ int	main(int argc, char **argv, char **envp)
 	}
 	if (!shell_read_loop(&shell))
 	{
+		int exit_status = shell.exit_status;
 		free_minishell(&shell);
 		rl_clear_history();
-		return (EXIT_FAILURE);
+		return (exit_status);
 	}
 	free_minishell(&shell);
 	rl_clear_history();

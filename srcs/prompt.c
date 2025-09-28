@@ -17,6 +17,7 @@
 #include <readline/readline.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 int global=0;
 
 // void	install_parent_signals(void)
@@ -126,32 +127,52 @@ bool shell_read_loop(t_minishell *shell)
         if (*shell->line)
             add_history(shell->line);
 
-        if (lexing(shell, shell->line, shell->envp) && parsing(shell))
+        if (lexing(shell, shell->line, shell->envp))
         {
-            // Collect heredocs - if interrupted, handle gracefully
-            if (!collect_all_heredocs(shell->ast, shell))
+            // Handle empty input (no tokens)
+            if (shell->tokens == NULL)
             {
-                // Check if it was interrupted by Ctrl+C
-                if (shell->exit_status == 130 || shell->exit_status==1)
-                {
-                    // shell->exit_status = 130;
-                    // global = 0;  // Reset global state
-
-                    // Clear readline state to prevent double prompt
-                    rl_replace_line("", 0);
-                    rl_on_new_line();
-
-                    // Don't print extra newline or prompt here
-                    reset_shell(shell);
-                    continue;  // Go back to readline prompt
-                }
-                // Other errors - continue normally
                 reset_shell(shell);
                 continue;
             }
 
-            // Execute if heredocs collected successfully
-            execute_ast(shell->ast, &shell->var, shell);
+            if (parsing(shell))
+            {
+                // Collect heredocs - if interrupted, handle gracefully
+                if (!collect_all_heredocs(shell->ast, shell))
+                {
+                    // Check if it was interrupted by Ctrl+C
+                    if (shell->exit_status == 130 || shell->exit_status==1)
+                    {
+                        // shell->exit_status = 130;
+                        // global = 0;  // Reset global state
+
+                        // Clear readline state to prevent double prompt
+                        rl_replace_line("", 0);
+                        rl_on_new_line();
+
+                        // Don't print extra newline or prompt here
+                        reset_shell(shell);
+                        continue;  // Go back to readline prompt
+                    }
+                    // Other errors - continue normally
+                    reset_shell(shell);
+                    continue;
+                }
+
+                // Execute if heredocs collected successfully
+                execute_ast(shell->ast, &shell->var, shell);
+            }
+        }
+        else
+        {
+            // If lexing failed, check if it was a syntax error
+            if (shell->exit_status == 2 && !isatty(STDIN_FILENO))
+            {
+                // Non-interactive mode: exit on syntax error
+                reset_shell(shell);
+                return (false);
+            }
         }
 
         reset_shell(shell);
