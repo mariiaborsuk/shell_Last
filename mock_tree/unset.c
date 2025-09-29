@@ -39,8 +39,7 @@ int	handle_unset_var(char *var_name, t_var **var)
 {
 	if (!is_valid_unset_var_name(var_name))
 	{
-		printf(" not a valid identifier");
-		return (1);
+		return (0);
 	}
 	remove_var(var_name, var);
 	return (0);

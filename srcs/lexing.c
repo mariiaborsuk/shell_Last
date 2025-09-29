@@ -72,6 +72,13 @@ bool	handle_token(t_token **tokens, char *str, int *i)
 		(*i)++;
 		return (true);
 	}
+	else if (str[*i] == '#')
+	{
+		// Skip rest of line for comments
+		while (str[*i] && str[*i] != '\n')
+			(*i)++;
+		return (true);
+	}
 	else if (str[*i] == '|')
 		return (create_token_pipe(tokens, str, i));
 	else if (str[*i] == '\"')

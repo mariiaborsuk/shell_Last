@@ -80,6 +80,8 @@ char	*check_cmd(char **paths, char *cmd)
 	{
 		if (access(cmd, F_OK) == 0 && access(cmd, X_OK) == 0)
 			return (cmd);
+		else
+			return ("PATH_ERROR"); // Special marker for path-based commands that don't exist
 	}
 	while (paths[i] != NULL)
 	{
@@ -111,6 +113,11 @@ void	use_execve(char **ar, char *envp[], t_minishell *shell)
 	{
 		free_argv(&paths_ar);
 		cmd_not_found(ar[0], shell, ": command not found\n");
+	}
+	if (ft_strcmp(path, "PATH_ERROR") == 0)
+	{
+		free_argv(&paths_ar);
+		bash_style_error_exit(ar[0], "No such file or directory", shell, 127);
 	}
 	if (execve(path, ar, envp) == -1)
 	{

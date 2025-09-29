@@ -6,7 +6,7 @@
 /*   By: mborsuk <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 23:11:10 by mborsuk           #+#    #+#             */
-/*   Updated: 2025/09/25 16:39:13 by mborsuk          ###   ########.fr       */
+/*   Updated: 2025/09/29 18:41:09 by mborsuk          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,6 +154,5 @@ bool	execute_pipe(t_ast *node, t_var *var, t_minishell *shell)
        {shell->exit_status = WEXITSTATUS(p.status2);}
     else if (WIFSIGNALED(p.status2))
         {shell->exit_status = 128 + WTERMSIG(p.status2);}
-	// unlink_close(rfd);
 	return (true);
 }

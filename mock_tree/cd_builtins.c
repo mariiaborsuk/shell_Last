@@ -98,6 +98,8 @@ int	check_n(char *str)
 {
 	int	i;
 
+	if (!str[1])
+		return (0);
 	i = 1;
 	while (str[i])
 	{

@@ -62,12 +62,16 @@ bool	is_wrong_redirect(t_token **tokens)
 			current = current->next;
 			if (!current || current->type != token_word)
 			{
-				if (current->type == token_pipe)
+				if (current && current->type == token_pipe)
 				{
 					syntax_error(PIPE_ERR);
 				}
+				else if (current && is_redirect(current->type))
+				{
+					redirect_error(&current);
+				}
 				else
-					redirect_error(tokens);
+					syntax_error(NEWLINE_ERR);
 				return (true);
 			}
 		}

@@ -245,7 +245,6 @@ int manage_heredoc(int fd, char *delimiter, t_minishell *shell)
                 write(STDERR_FILENO, delimiter, ft_strlen(delimiter));
                 write(STDERR_FILENO, "')\n", 3);
             }
-            printf("^D IS CALLED\n");
             shell->exit_status = 1;
             if (tty != STDIN_FILENO) close(tty);
             return 1;

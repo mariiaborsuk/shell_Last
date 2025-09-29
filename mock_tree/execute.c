@@ -37,20 +37,19 @@ void	is_dir(char **argv, t_minishell *sh, char **envp)
 	if (stat(argv[0], &sb) == -1)
 	{
 		sh->exit_status = 127;
-		perror_exit(argv[0], sh, 127);
+		bash_style_error_exit(argv[0], "No such file or directory", sh, 127);
 	}
 	if (access(argv[0], F_OK) != 0)
 	{
-		perror_exit(" No such file or directory\n ", sh, 127);
+		bash_style_error_exit(argv[0], "No such file or directory", sh, 127);
 	}
 	if (S_ISDIR(sb.st_mode))
 	{
-		errno = EISDIR;
-		perror_exit(argv[0], sh, 126);
+		bash_style_error_exit(argv[0], "Is a directory", sh, 126);
 	}
 	if (access(argv[0], X_OK) != 0)
 	{
-		perror_exit(argv[0], sh, 126);
+		bash_style_error_exit(argv[0], "Permission denied", sh, 126);
 	}
 	execve(argv[0], argv, envp);
 	perror_exit("execve\n", sh, 126);
@@ -80,6 +79,10 @@ int	extern_cmd(char **argv, char **envp, t_minishell *sh)
 {
 	pid_t	pid;
 	int		status;
+
+	// Check for variable assignment before forking
+	if (is_variable_assignment(argv))
+		return (execute_variable_assignment(argv, &sh->var));
 
 	pid = fork();
 	if (pid < 0)

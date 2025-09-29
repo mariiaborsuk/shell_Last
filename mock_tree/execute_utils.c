@@ -41,6 +41,17 @@ void	perror_exit(char *er, t_minishell *sh, int num)
 	exit(num);
 }
 
+void	bash_style_error_exit(char *cmd, char *error_msg, t_minishell *sh, int num)
+{
+	write(2, "bash: ", 6);
+	write(2, cmd, ft_strlen(cmd));
+	write(2, ": ", 2);
+	write(2, error_msg, ft_strlen(error_msg));
+	write(2, "\n", 1);
+	free_minishell(sh);
+	exit(num);
+}
+
 void	install_child_signals(void)
 {
 	struct sigaction	dfl;

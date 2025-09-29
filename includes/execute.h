@@ -17,6 +17,7 @@
 # include "../includes/types.h"
 # include <ctype.h>
 # include <fcntl.h>
+# include <limits.h>
 # include <stdbool.h>
 # include <stdio.h>
 # include <stdlib.h>
@@ -57,6 +58,8 @@ int			handle_unset_var(char *var_name, t_var **var);
 bool		is_valid_unset_var_name(const char *var_name);
 int			exec_unset(char **cmd, t_var **var);
 int			extern_cmd(char **argv, char **envp, t_minishell *sh);
+int			is_variable_assignment(char **cmd);
+int			execute_variable_assignment(char **cmd, t_var **var);
 void		close_files(t_redirect *head);
 int			get_var_count(t_var *var);
 char		**convert_var_to_envp(t_var **var);
@@ -96,6 +99,7 @@ t_var		*add_new_var(char *val, char *key, bool exported);
 void		free_execve(char *ar, t_minishell *shell);
 void		exec_and_exit(char **argv, t_minishell *sh, char **envp);
 void		perror_exit(char *er, t_minishell *sh, int num);
+void		bash_style_error_exit(char *cmd, char *error_msg, t_minishell *sh, int num);
 char		*remove_braces(char *name);
 void		add_var(const t_var *exported_var, t_var **head);
 void		empty_argv(char **argv, t_minishell *sh);
